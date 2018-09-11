@@ -1,19 +1,35 @@
 <html>
     <head>
         <title></title>
+        <link rel="stylesheet" type="text/css" href="main.css" />
     </head>
     <body>
-            <div id="app">
-                {{ message }}
-            </div>
-                  
+        <div id="app">
+            <h1>{{ message }}</h1>
+            <transition name="fade">
+                <span v-if="seen">Now you see me</span>
+            </transition>
+        </div>
+        <div id="app2"> 
+            <span v-bind:title="message">
+                Hover this!
+            </span>
+        </div>
+
         <!-- development version, includes helpful console warnings -->
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script>
             var app = new Vue({
                 el: '#app',
                 data: {
-                    message: 'Hello Vue!'
+                    message: 'Hello Vue!',
+                    seen: true,
+                }
+                });
+            var app2 = new Vue({
+                el: '#app2',
+                data: {
+                    message: 'title hover!'
                 }
                 })
         </script>
