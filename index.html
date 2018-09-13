@@ -14,16 +14,16 @@
         </div>
         <div id="app2"> 
             <span v-bind:title="message">
-                Hover this!
+                Hover this! 
             </span>
             <br/>
             <ol>
-            <li v-for="todo in todos">
-                {{ todo.text }}
-            </li>
+                <li v-for="todo in todos">
+                    {{ todo.text }}
+                </li>
             </ol>
         </div>
-        <div id="app-7">
+        <div id="app3">
             <ol>
                 <!--
                 Now we provide each todo-item with the todo object
@@ -38,6 +38,11 @@
                 v-bind:key="x.id">
                 </todo-item>
             </ol>
+            <div><a v-bind:href="href" target="_blank">{{href}}</a></div>
+            <br/>
+            <input type="text" v-model="msg" />
+            <button @click="alert(msg)">alert</button>
+            
         </div>
 
         <!-- development version, includes helpful console warnings -->
@@ -72,15 +77,22 @@
                 template: '<li>{{ i.text + baze}}</li>'
             });
 
-            var app7 = new Vue({
-                el: '#app-7',
+            var app3 = new Vue({
+                el: '#app3',
                 data: {
                     groceryList: [
                     { id: 0, text: 'Vegetables' },
                     { id: 1, text: 'Cheese' },
                     { id: 2, text: 'Whatever else humans are supposed to eat' }
-                    ]
-                }
+                    ],
+                    href: 'https://google.com',
+                    msg: 'hey',
+                },
+                methods: {
+                    alert: function(msg) {
+                        alert(msg);
+                    },
+                },
             });
         </script>
     </body>
