@@ -6,31 +6,26 @@
     <body>
         <div id="app">
             <h1>{{ message }}</h1>
-            <button v-on:click="toggle">toggle</button>
+            <button v-on:click="toggle">toggle (v-on:click="toggle")</button>
+            <br/>
             <transition name="fade">
-                <span v-if="seen">Now you see me</span>
+                <span v-if="seen">Now you see me (transition name="fade")</span>
             </transition>
-            <input type="text" v-model="message" />
-        </div>
-        <div id="app2"> 
+            <br/>
+            <input type="text" v-model="message" /><br/>
             <span v-bind:title="message">
-                Hover this! 
+                Hover this! (v-bind:title="message")
             </span>
             <br/>
+            <h2>v-for="todo in todos"</h2>
             <ol>
                 <li v-for="todo in todos">
                     {{ todo.text }}
                 </li>
             </ol>
-        </div>
-        <div id="app3">
+            <br/>
+            <h2>Vue.component('todo-item'){}</h2>
             <ol>
-                <!--
-                Now we provide each todo-item with the todo object
-                it's representing, so that its content can be dynamic.
-                We also need to provide each component with a "key",
-                which will be explained later.
-                -->
                 <todo-item
                 v-for="x in groceryList"
                 v-bind:i="x"
@@ -38,62 +33,62 @@
                 v-bind:key="x.id">
                 </todo-item>
             </ol>
-            <div><a v-bind:href="href" target="_blank">{{href}}</a></div>
+            <div><a v-bind:href="href" target="_blank">{{href}}</a> (by v-bind:href)</div>
             <br/>
-            <input type="text" v-model="msg" />
-            <button @click="alert(msg)">alert</button>
-            
+            <button @click="alert(message)">@click="alert(message)"</button>
+            <br/>
+            <form v-on:submit.prevent="form1Submit"> <input type="submit" value="v-on:submit.prevent='form1Submit'" /> </form>
         </div>
 
         <!-- development version, includes helpful console warnings -->
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script>
+            Vue.component('todo-item', {
+                props: ['i', 'baze'],
+                template: '<li>{{ i.text + baze}}</li>'
+            });
             var app = new Vue({
             el: '#app',
             data: {
                 message: 'Hello Vue!',
                 seen: false,
-                
-            },
-            methods: {
-                toggle: function () {
-                    this.seen = !this.seen;
-                },
-            },
-            });
-            var app2 = new Vue({
-            el: '#app2',
-            data: {
-                message: 'title hover!',
                 todos: [
                     { text: 'Learn JavaScript' },
                     { text: 'Learn Vue' },
                     { text: 'Build something awesome' },
                 ],
-            }
-            })
-            Vue.component('todo-item', {
-                props: ['i', 'baze'],
-                template: '<li>{{ i.text + baze}}</li>'
-            });
-
-            var app3 = new Vue({
-                el: '#app3',
-                data: {
-                    groceryList: [
+                groceryList: [
                     { id: 0, text: 'Vegetables' },
                     { id: 1, text: 'Cheese' },
                     { id: 2, text: 'Whatever else humans are supposed to eat' }
-                    ],
-                    href: 'https://google.com',
-                    msg: 'hey',
+                ],
+                href: 'https://google.com',
+            },
+            methods: {
+                toggle: function () {
+                    this.seen = !this.seen;
                 },
-                methods: {
-                    alert: function(msg) {
-                        alert(msg);
-                    },
+                alert: function(msg) {
+                    alert(msg);
                 },
+                form1Submit: function() {
+                    this.message = 'form1 submitted';
+                },
+            },
+            created: function (){
+                console.log('created');
+            },
+            mounted: function (){
+                console.log('mounted');
+            },
+            updated: function (){
+                console.log('updated');
+            },
+            destroyed: function (){
+                console.log('destroyed');
+            },
             });
+            
         </script>
     </body>
 </html>
