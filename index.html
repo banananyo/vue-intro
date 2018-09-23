@@ -2,28 +2,36 @@
     <head>
         <title></title>
         <link rel="stylesheet" type="text/css" href="main.css" />
+        <style>
+            .active {
+                color: red;
+            }
+            .bold {
+                font-weight: bold;
+            }
+        </style>
     </head>
     <body>
         <div id="app">
             <h1>{{ message }}</h1>
             <button v-on:click="toggle">toggle (v-on:click="toggle")</button>
-            <br/>
+            <hr/>
             <transition name="fade">
                 <span v-if="seen">Now you see me (transition name="fade")</span>
             </transition>
-            <br/>
+            <hr/>
             <input type="text" v-model="message" /><br/>
             <span v-bind:title="message">
                 Hover this! (v-bind:title="message")
             </span>
-            <br/>
+            <hr/>
             <h2>v-for="todo in todos"</h2>
             <ol>
                 <li v-for="todo in todos">
                     {{ todo.text }}
                 </li>
             </ol>
-            <br/>
+            <hr/>
             <h2>Vue.component('todo-item'){}</h2>
             <ol>
                 <todo-item
@@ -34,59 +42,118 @@
                 </todo-item>
             </ol>
             <div><a v-bind:href="href" target="_blank">{{href}}</a> (by v-bind:href)</div>
-            <br/>
+            <hr/>
             <button @click="alert(message)">@click="alert(message)"</button>
-            <br/>
+            <hr/>
             <form v-on:submit.prevent="form1Submit"> <input type="submit" value="v-on:submit.prevent='form1Submit'" /> </form>
+            <hr/>
+            <div>{{ reverseMethod(message) }}</div>
+            <div>{{ reverseComputed }}</div>
+            <hr/>
+            <p>{{ oldq }}</p><br/>
+            <p>
+                Ask a yes/no question:
+                <input v-model="question">
+            </p>
+            <p>{{ answer }}</p>
+            <hr/>
+            <div v-bind:class="{ active: isActive, bold: isBold }">Sample.</div>
+            <button @click="toggleActive()">active</button>
+            <button @click="toggleBold()">bold</button>
+            <hr/>
         </div>
 
         <!-- development version, includes helpful console warnings -->
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
         <script>
             Vue.component('todo-item', {
                 props: ['i', 'baze'],
                 template: '<li>{{ i.text + baze}}</li>'
             });
             var app = new Vue({
-            el: '#app',
-            data: {
-                message: 'Hello Vue!',
-                seen: false,
-                todos: [
-                    { text: 'Learn JavaScript' },
-                    { text: 'Learn Vue' },
-                    { text: 'Build something awesome' },
-                ],
-                groceryList: [
-                    { id: 0, text: 'Vegetables' },
-                    { id: 1, text: 'Cheese' },
-                    { id: 2, text: 'Whatever else humans are supposed to eat' }
-                ],
-                href: 'https://google.com',
-            },
-            methods: {
-                toggle: function () {
-                    this.seen = !this.seen;
+                el: '#app',
+                data: {
+                    message: 'Hello Vue!',
+                    seen: false,
+                    todos: [
+                        { text: 'Learn JavaScript' },
+                        { text: 'Learn Vue' },
+                        { text: 'Build something awesome' },
+                    ],
+                    groceryList: [
+                        { id: 0, text: 'Vegetables' },
+                        { id: 1, text: 'Cheese' },
+                        { id: 2, text: 'Whatever else humans are supposed to eat' }
+                    ],
+                    href: 'https://google.com',
+                    question: '',
+                    answer: 'I cannot give you an answer until you ask a question!',
+                    oldq: '',
+                    isActive: false,
+                    isBold: false,
                 },
-                alert: function(msg) {
-                    alert(msg);
+                methods: {
+                    toggle: function () {
+                        this.seen = !this.seen;
+                    },
+                    alert: function(msg) {
+                        alert(msg);
+                    },
+                    form1Submit: function() {
+                        this.message = 'form1 submitted';
+                    },
+                    reverseMethod: function(msg) {
+                        return msg.split('').reverse().join('');
+                    },
+                    getAnswer:  function () {
+                        if (this.question.indexOf('?') === -1) {
+                            this.answer = 'Questions usually contain a question mark. ;-)'
+                            return
+                        }
+                        this.answer = 'requesting to API...'
+                        var vm = this
+                        axios.get('https://yesno.wtf/api')
+                            .then(function (response) {
+                                vm.answer = _.capitalize(response.data.answer)
+                            })
+                            .catch(function (error) {
+                                vm.answer = 'Error! Could not reach the API. ' + error
+                            });
+                    },
+                    toggleActive: function() {
+                        this.isActive = !this.isActive;
+                    },
+                    toggleBold: function() {
+                        this.isBold = !this.isBold;
+                    },
                 },
-                form1Submit: function() {
-                    this.message = 'form1 submitted';
+                computed: {
+                    reverseComputed: function() {
+                        return this.message.split('').reverse().join('');
+                    },
                 },
-            },
-            created: function (){
-                console.log('created');
-            },
-            mounted: function (){
-                console.log('mounted');
-            },
-            updated: function (){
-                console.log('updated');
-            },
-            destroyed: function (){
-                console.log('destroyed');
-            },
+                watch: {
+                    question: function (newQuestion, oldQuestion) {
+                        this.oldq = oldQuestion;
+                        this.answer = 'debounce is calling...'
+                        this.debouncedGetAnswer();
+                    }
+                },
+                created: function (){
+                    console.log('created');
+                    this.debouncedGetAnswer = _.debounce(this.getAnswer, 500)
+                },
+                mounted: function (){
+                    console.log('mounted');
+                },
+                updated: function (){
+                    console.log('updated');
+                },
+                destroyed: function (){
+                    console.log('destroyed');
+                },
             });
             
         </script>
